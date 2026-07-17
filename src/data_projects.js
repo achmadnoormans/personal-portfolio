@@ -73,7 +73,12 @@ export const projectsData = [
     ],
     tech: ["Google Sheet", "Data Studio", "Apps Script"],
     confidential: true,
-    link: "https://datastudio.google.com/reporting/b90cce9a-7115-4f64-9874-7c4676f7c5c0"
+    links: [
+      { url: "https://datastudio.google.com/reporting/b90cce9a-7115-4f64-9874-7c4676f7c5c0", label: "View Live Dashboard" },
+      { url: "https://docs.google.com/spreadsheets/d/1S1G_L8MfTq-s3i14TzlV1jX9k31-UHDzwU9kH6ZYD9A/edit?usp=sharing", label: "Consolidation Data" },
+      { url: "https://docs.google.com/spreadsheets/d/1Loxug8WT7yNxCfde9Qxf3uEvJUzIPS7nf-kyKhXkuCE/edit?usp=sharing", label: "Transformation Data" },
+      { url: "https://docs.google.com/spreadsheets/d/1ze3Dzli8Obzms6BNFlibYnwLMUhwMkoqRwjEZ0_ujWY/edit?usp=sharing", label: "Data Stream" }
+    ]
   },
   {
     id: 2,
@@ -180,7 +185,7 @@ export const projectsData = [
     tech: ["Google Sheet", "Data Studio", "Apps Script"],
     confidential: true,
     comingSoon: false,
-    link: "#"
+    link: "https://docs.google.com/spreadsheets/d/1OF0WbhI3PdRj6TLXr4Bx6gpirhI8rzRNofXFsi3QvGc/edit?gid=0#gid=0"
   },
   {
     id: 4,
@@ -254,7 +259,7 @@ export const projectsData = [
     confidential: false,
     isDummy: true,
     comingSoon: false,
-    link: "#"
+    link: "https://docs.google.com/spreadsheets/d/17r1ZjStXBSt5w4ypqXgHI-dEQ8p2T8VINdtxErMamBs/edit?usp=sharing"
   },
   {
     id: 5,

@@ -14,6 +14,14 @@ import {
   activitiesData 
 } from './data.js';
 
+export const toggleScrollLock = (isLocked) => {
+  document.body.style.overflow = isLocked ? 'hidden' : '';
+  const mainScroll = document.getElementById('main-scroll-container');
+  if (mainScroll) {
+    mainScroll.style.overflowY = isLocked ? 'hidden' : 'auto';
+  }
+};
+
     // ==========================================
     // 1. KONFIGURASI TEMA & WARNA
     // ==========================================
@@ -327,7 +335,7 @@ import {
       const [showColorPicker, setShowColorPicker] = useState(false);
       const mobileMenuRef = useRef(null);
       const colorPickerRef = useRef(null);
-      const isCreatorMode = typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('demo') === 'true' : false;
+      const isCreatorMode = typeof window !== 'undefined' ? (window.location.pathname.startsWith('/demo') || new URLSearchParams(window.location.search).get('demo') === 'true') : false;
 
       useEffect(() => {
         const handleClickOutside = (event) => {
@@ -348,12 +356,12 @@ import {
 
       useEffect(() => {
         if (isMobileMenuOpen) {
-          document.body.style.overflow = 'hidden';
+          toggleScrollLock(true);
         } else {
-          document.body.style.overflow = '';
+          toggleScrollLock(false);
         }
         return () => {
-          document.body.style.overflow = '';
+          toggleScrollLock(false);
         };
       }, [isMobileMenuOpen]);
 
@@ -485,7 +493,8 @@ import {
 
               // Download CV Button (Full width button positioned under stats boxes)
               React.createElement("a", { 
-                href: "#", 
+                href: "/Curriculum%20Vitae%20Achmad%20Noorman%20Setiawan.pdf", 
+                download: true,
                 className: `w-full font-bold py-2.5 rounded-xl flex items-center justify-center gap-2 transition-all text-xs shadow-sm mt-2.5 ${
                   actualTheme === 'dark' 
                     ? `${theme.accentBgDark} ${theme.accentHoverDark} text-white` 
@@ -637,7 +646,7 @@ import {
             }, actualTheme === 'dark' ? React.createElement(Sun, { size: 14 }) : React.createElement(Moon, { size: 14 })),
 
             // Color Palette Picker
-            React.createElement("div", { className: "relative", ref: colorPickerRef },
+            isCreatorMode && React.createElement("div", { className: "relative", ref: colorPickerRef },
               React.createElement("button", {
                 onClick: () => setShowColorPicker(!showColorPicker),
                 title: `Theme Color: ${activePalette}`,
@@ -727,7 +736,7 @@ import {
               "Berpengalaman dalam merancang dan membangun otomatisasi pengolahan data bisnis dan individu untuk mempercepat pengambilan keputusan strategis."
             ),
             React.createElement("div", { className: `flex items-center flex-wrap gap-4 pt-4` },
-              React.createElement("a", { href: "#", className: `font-semibold rounded-xl flex items-center justify-center gap-2 transition-colors ${actualTheme === 'dark' ? `${theme.accentBgDark} ${theme.accentHoverDark} text-white` : `${theme.accentBgLight} ${theme.accentHoverLight} text-white`} ${isMobileView ? 'px-4 py-2.5 text-[13px]' : 'px-6 py-3 text-sm'}` },
+              React.createElement("a", { href: "/Curriculum%20Vitae%20Achmad%20Noorman%20Setiawan.pdf", download: true, className: `font-semibold rounded-xl flex items-center justify-center gap-2 transition-colors ${actualTheme === 'dark' ? `${theme.accentBgDark} ${theme.accentHoverDark} text-white` : `${theme.accentBgLight} ${theme.accentHoverLight} text-white`} ${isMobileView ? 'px-4 py-2.5 text-[13px]' : 'px-6 py-3 text-sm'}` },
                 React.createElement(Download, { size: isMobileView ? 16 : 18 }),
                 "Download CV"
               ),
@@ -951,12 +960,12 @@ import {
       // --- Body Scroll Lock ---
       useEffect(() => {
         if (selectedItem) {
-          document.body.style.overflow = 'hidden';
+          toggleScrollLock(true);
         } else {
-          document.body.style.overflow = '';
+          toggleScrollLock(false);
         }
         return () => {
-          document.body.style.overflow = '';
+          toggleScrollLock(false);
         };
       }, [selectedItem]);
 
@@ -1513,12 +1522,12 @@ import {
       // --- Body Scroll Lock ---
       useEffect(() => {
         if (showAllModal || selectedCourse) {
-          document.body.style.overflow = 'hidden';
+          toggleScrollLock(true);
         } else {
-          document.body.style.overflow = '';
+          toggleScrollLock(false);
         }
         return () => {
-          document.body.style.overflow = '';
+          toggleScrollLock(false);
         };
       }, [showAllModal, selectedCourse]);
 
@@ -1856,6 +1865,8 @@ import {
       const [currentPage, setCurrentPage] = useState(1);
       const [selectedProject, setSelectedProject] = useState(null);
       const [activeDetailTab, setActiveDetailTab] = useState('overview');
+      const [showBackTooltip, setShowBackTooltip] = useState(false);
+      const backHoverTimer = useRef(null);
 
       useEffect(() => {
         if (selectedProject) setActiveDetailTab('overview');
@@ -1865,6 +1876,9 @@ import {
         if (activeSection !== 'Projects' && activeSection !== 'Home') {
           const timer = setTimeout(() => {
             setSelectedProject(null);
+            setActiveFilter('All');
+            setCurrentPage(1);
+            setActiveDetailTab('overview');
           }, 800);
           return () => clearTimeout(timer);
         }
@@ -1941,12 +1955,12 @@ import {
       // --- Body Scroll Lock ---
       useEffect(() => {
         if (showAllModal || selectedProject || lightboxImg) {
-          document.body.style.overflow = 'hidden';
+          toggleScrollLock(true);
         } else {
-          document.body.style.overflow = '';
+          toggleScrollLock(false);
         }
         return () => {
-          document.body.style.overflow = '';
+          toggleScrollLock(false);
         };
       }, [showAllModal, selectedProject, lightboxImg]);
 
@@ -1990,9 +2004,35 @@ import {
       });
       const allTools = ['All', ...Object.keys(toolsCounts).sort((a, b) => toolsCounts[b] - toolsCounts[a])];
       
+      const isDemoModeLocal = typeof window !== 'undefined' ? (window.location.pathname.startsWith('/demo') || new URLSearchParams(window.location.search).get('demo') === 'true') : false;
+
       const filteredProjects = activeFilter === 'All' 
-        ? projectsData 
+        ? [...projectsData] 
         : projectsData.filter(p => p.tech && p.tech.includes(activeFilter));
+
+      if (!isDemoModeLocal) {
+        filteredProjects.sort((a, b) => {
+          const isAIncomplete = !(
+            !!(a.description || a.descriptionEN) &&
+            !!(a.challenge || a.challengeEN || a.challengePoints || a.challengePointsEN) &&
+            !!(a.solution || a.solutionEN || a.solutionPoints || a.solutionPointsEN) &&
+            !!(a.achievements || a.achievementsEN)
+          );
+          const isBIncomplete = !(
+            !!(b.description || b.descriptionEN) &&
+            !!(b.challenge || b.challengeEN || b.challengePoints || b.challengePointsEN) &&
+            !!(b.solution || b.solutionEN || b.solutionPoints || b.solutionPointsEN) &&
+            !!(b.achievements || b.achievementsEN)
+          );
+          
+          const aIsComingSoon = a.comingSoon === true || isAIncomplete;
+          const bIsComingSoon = b.comingSoon === true || isBIncomplete;
+
+          if (aIsComingSoon && !bIsComingSoon) return 1;
+          if (!aIsComingSoon && bIsComingSoon) return -1;
+          return 0;
+        });
+      }
 
       const getCategoryStyle = (category) => {
         switch (category) {
@@ -2191,7 +2231,14 @@ import {
         const catStyle = getCategoryStyle(project.category);
         const metric = getProjectMetric(project);
         const year = getProjectYear(project);
-        const isComingSoon = project.comingSoon === true;
+        const hasDescription = !!(project.description || project.descriptionEN);
+        const hasChallenge = !!(project.challenge || project.challengeEN || project.challengePoints || project.challengePointsEN);
+        const hasSolution = !!(project.solution || project.solutionEN || project.solutionPoints || project.solutionPointsEN);
+        const hasAchievements = !!(project.achievements || project.achievementsEN);
+        const isProjectIncomplete = !(hasDescription && hasChallenge && hasSolution && hasAchievements);
+        const isDemoMode = typeof window !== 'undefined' ? (window.location.pathname.startsWith('/demo') || new URLSearchParams(window.location.search).get('demo') === 'true') : false;
+        
+        const isComingSoon = isDemoMode ? (project.comingSoon === true) : (project.comingSoon === true || isProjectIncomplete);
 
         return React.createElement("div", {
           key: project.id,
@@ -2335,16 +2382,36 @@ import {
             },
               // Header of Card (Projects Title)
               React.createElement("div", { className: "flex items-start gap-3 mb-4 pb-4 border-b text-left shrink-0 " + (actualTheme === 'dark' ? "border-white/5" : "border-slate-100") },
-                selectedProject && React.createElement("button", {
-                  onClick: () => setSelectedProject(null),
-                  className: `mt-0.5 p-1.5 sm:p-2 rounded-full transition-all flex items-center justify-center border hover:-translate-x-1 shrink-0 ${
-                    actualTheme === 'dark' 
-                      ? 'bg-white/5 hover:bg-white/10 text-gray-200 border-white/10' 
-                      : 'bg-white hover:bg-slate-50 text-slate-700 border-slate-200 shadow-sm hover:shadow-md'
-                  }`,
-                  title: "Kembali"
-                }, 
-                  React.createElement(ArrowLeft, { size: 20 })
+                selectedProject && React.createElement("div", { className: "relative shrink-0 flex items-center" },
+                  React.createElement("button", {
+                    onClick: () => {
+                      setSelectedProject(null);
+                      if (backHoverTimer.current) clearTimeout(backHoverTimer.current);
+                      setShowBackTooltip(false);
+                    },
+                    onMouseEnter: () => {
+                      if (backHoverTimer.current) clearTimeout(backHoverTimer.current);
+                      backHoverTimer.current = setTimeout(() => setShowBackTooltip(true), 2000);
+                    },
+                    onMouseLeave: () => {
+                      if (backHoverTimer.current) clearTimeout(backHoverTimer.current);
+                      setShowBackTooltip(false);
+                    },
+                    className: `mt-0.5 p-1.5 sm:p-2 rounded-full transition-all flex items-center justify-center border hover:-translate-x-1 shrink-0 ${
+                      actualTheme === 'dark' 
+                        ? 'bg-white/5 hover:bg-white/10 text-gray-200 border-white/10' 
+                        : 'bg-white hover:bg-slate-50 text-slate-700 border-slate-200 shadow-sm hover:shadow-md'
+                    }`
+                  }, 
+                    React.createElement(ArrowLeft, { size: 20 })
+                  ),
+                  showBackTooltip && React.createElement("div", {
+                    className: `absolute top-[calc(100%+8px)] left-0 whitespace-nowrap px-2.5 py-1.5 rounded-lg shadow-xl text-[11px] font-bold tracking-wide z-50 transition-opacity animate-in fade-in duration-200 ${
+                      actualTheme === 'dark'
+                        ? 'bg-zinc-800/95 backdrop-blur text-zinc-200 border border-white/10'
+                        : 'bg-slate-800/95 backdrop-blur text-white border border-slate-700'
+                    }`
+                  }, language === 'ID' ? "Tekan ESC untuk kembali" : "Press ESC to go back")
                 ),
                 React.createElement("div", { className: "flex flex-col gap-1.5 flex-1 min-w-0" },
                   React.createElement("h2", { className: `text-xl sm:text-2xl font-bold tracking-tight ${actualTheme === 'dark' ? 'text-white' : 'text-slate-900'}` },
@@ -2463,7 +2530,7 @@ import {
                     React.createElement("div", { className: "flex flex-col lg:flex-row gap-8 lg:gap-0 pb-8 items-start relative" },
                       
                       // Left Column (Sticky Metadata)
-                      React.createElement("div", { className: "flex flex-col gap-6 w-full lg:w-[35%] lg:sticky lg:top-0 shrink-0 lg:pt-2 lg:pr-10" },
+                      React.createElement("div", { className: "flex flex-col gap-5 w-full lg:w-[35%] lg:sticky lg:top-0 shrink-0 lg:pt-2 lg:pr-10" },
                         // Title & Badges
                         React.createElement("div", { className: "flex flex-col gap-4 text-left" },
                           React.createElement("h3", { className: `font-extrabold text-3xl lg:text-4xl leading-snug whitespace-pre-line tracking-tight ${actualTheme === 'dark' ? 'text-white' : 'text-black'}` }, language === 'ID' ? selectedProject.title : (selectedProject.titleEN || selectedProject.title)),
@@ -2502,39 +2569,46 @@ import {
 
                         // Project Link
                         (function() {
-                          if (!selectedProject.link || selectedProject.link === "#") return null;
-                          let linkText = "View Live Project";
-                          let LinkIcon = ExternalLink;
-                          const url = selectedProject.link.toLowerCase();
-                          if (url.includes('datastudio') || url.includes('looker') || url.includes('powerbi') || url.includes('tableau')) {
-                            linkText = "View Live Dashboard";
-                            LinkIcon = Monitor;
-                          } else if (url.includes('colab')) {
-                            linkText = "View Notebook";
-                            LinkIcon = Code;
-                          } else if (url.includes('spreadsheets')) {
-                            linkText = "View Spreadsheet";
-                            LinkIcon = Database;
-                          } else if (url.includes('script.google')) {
-                            linkText = "View Source Code";
-                            LinkIcon = Code;
-                          } else if (url.includes('github.com')) {
-                            linkText = "GitHub Repository";
-                            LinkIcon = Github;
-                          }
+                          const projectLinks = selectedProject.links || (selectedProject.link && selectedProject.link !== "#" ? [selectedProject.link] : []);
+                          if (projectLinks.length === 0) return null;
 
-                          return React.createElement("div", { className: "flex flex-col gap-3 text-left" },
+                          return React.createElement("div", { className: "flex flex-col gap-2 text-left" },
                             React.createElement("h4", { className: `text-sm font-bold uppercase tracking-widest mb-1 ${actualTheme === 'dark' ? 'text-gray-300' : 'text-black'}` }, "Project Links"),
-                            React.createElement("div", { className: "flex flex-col" },
-                              React.createElement("a", { 
-                                href: selectedProject.link, 
-                                target: "_blank", 
-                                rel: "noopener noreferrer", 
-                                className: `flex items-center gap-2.5 group ${actualTheme === 'dark' ? 'text-gray-300 hover:text-white' : 'text-slate-700 hover:text-black'}` 
-                              }, 
-                                React.createElement(LinkIcon, { size: 20, strokeWidth: 1.5, className: "shrink-0 transition-transform group-hover:scale-110" }),
-                                React.createElement("span", { className: "text-sm font-semibold tracking-wide" }, linkText)
-                              )
+                            React.createElement("div", { className: "flex flex-col gap-2" },
+                              projectLinks.map((linkData, idx) => {
+                                const isString = typeof linkData === 'string';
+                                const linkUrl = isString ? linkData : linkData.url;
+                                let linkText = isString ? "View Live Project" : linkData.label;
+                                let LinkIcon = ExternalLink;
+                                const url = linkUrl.toLowerCase();
+                                if (url.includes('datastudio') || url.includes('looker') || url.includes('powerbi') || url.includes('tableau')) {
+                                  if (isString) linkText = "View Live Dashboard";
+                                  LinkIcon = Monitor;
+                                } else if (url.includes('colab')) {
+                                  if (isString) linkText = "View Notebook";
+                                  LinkIcon = Code;
+                                } else if (url.includes('spreadsheets') || url.includes('docs.google.com/spreadsheets')) {
+                                  if (isString) linkText = "View Spreadsheet";
+                                  LinkIcon = Database;
+                                } else if (url.includes('script.google')) {
+                                  if (isString) linkText = "View Source Code";
+                                  LinkIcon = Code;
+                                } else if (url.includes('github.com')) {
+                                  if (isString) linkText = "GitHub Repository";
+                                  LinkIcon = Github;
+                                }
+
+                                return React.createElement("a", { 
+                                  key: idx,
+                                  href: linkUrl, 
+                                  target: "_blank", 
+                                  rel: "noopener noreferrer", 
+                                  className: `flex items-center gap-2.5 group ${actualTheme === 'dark' ? 'text-gray-300 hover:text-white' : 'text-slate-700 hover:text-black'}` 
+                                }, 
+                                  React.createElement(LinkIcon, { size: 16, strokeWidth: 1.5, className: "shrink-0 transition-transform group-hover:scale-110" }),
+                                  React.createElement("span", { className: "text-xs font-semibold tracking-wide" }, linkText)
+                                );
+                              })
                             )
                           );
                         })()
@@ -2851,6 +2925,10 @@ import {
         if (activeSection !== 'Certificate') {
           const timer = setTimeout(() => {
             setSelectedCertificate(null);
+            setActiveFilter('All');
+            setCurrentPage(1);
+            setActiveDetailTab('overview');
+            setCurrentCertImageIndex(0);
           }, 800);
           return () => clearTimeout(timer);
         }
@@ -2927,12 +3005,12 @@ import {
       // --- Body Scroll Lock ---
       useEffect(() => {
         if (showAllModal || selectedCertificate || lightboxImg) {
-          document.body.style.overflow = 'hidden';
+          toggleScrollLock(true);
         } else {
-          document.body.style.overflow = '';
+          toggleScrollLock(false);
         }
         return () => {
-          document.body.style.overflow = '';
+          toggleScrollLock(false);
         };
       }, [showAllModal, selectedCertificate, lightboxImg]);
 
@@ -4575,6 +4653,7 @@ import {
     // 12. APLIKASI UTAMA
     // ==========================================
     function App() {
+      const isDemoMode = typeof window !== 'undefined' ? (window.location.pathname.startsWith('/demo') || new URLSearchParams(window.location.search).get('demo') === 'true') : false;
       const [actualTheme, setActualTheme] = useState('light');
       const [isMobileView, setIsMobileView] = useState(typeof window !== 'undefined' ? window.innerWidth < 768 : false);
 
@@ -4589,7 +4668,7 @@ import {
 
       const [activePalette, setActivePalette] = useState('google');
       const [activeSection, setActiveSection] = useState('Projects');
-      const [language, setLanguage] = useState('ID');
+      const [language, setLanguage] = useState('EN');
       const [isWaPopupOpen, setIsWaPopupOpen] = useState(true);
       const [activeResumeTab, setActiveResumeTab] = useState('education');
       const [showColorPickerNavbar, setShowColorPickerNavbar] = useState(false);
@@ -4650,6 +4729,8 @@ import {
       // Spacebar & Enter Smooth Navigation to Next Section
       useEffect(() => {
         const handleKeyDown = (e) => {
+          if (document.body.style.overflow === 'hidden') return;
+          
           if (e.key === ' ' || e.key === 'Enter') {
             // Prevent default page down scroll
             e.preventDefault();
@@ -4833,6 +4914,7 @@ import {
                     `),
           React.createElement("div", { className: `relative overflow-hidden transition-all duration-500 ${actualTheme === 'dark' ? `${theme.darkBg} text-white` : 'bg-slate-50 text-slate-900'} w-full min-h-screen` },
             React.createElement("div", { 
+              id: "main-scroll-container",
               className: "w-full h-full overflow-y-auto overflow-x-hidden hide-scrollbar relative z-0",
               onScroll: handleScroll
             },
@@ -4944,7 +5026,7 @@ import {
                   ),
 
                   // Color Palette Picker
-                  React.createElement("div", { className: "relative", ref: colorPickerNavbarRef },
+                  isDemoMode && React.createElement("div", { className: "relative", ref: colorPickerNavbarRef },
                     React.createElement("button", {
                       onClick: () => setShowColorPickerNavbar(!showColorPickerNavbar),
                       title: `Theme Color: ${activePalette}`,
